@@ -76,7 +76,7 @@ jobs:
     name: "Deploy infrastructure"
     needs: [build_code]
     outputs:
-      # function_name: ${{ steps.terraform_output.outputs.function_name }}
+      function_name: ${{ steps.terraform_output.outputs.function_name }}
       resource_group_name: ${{ steps.terraform_output.outputs.resource_group_name }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -116,8 +116,10 @@ jobs:
         working-directory: server/terraform
         id: terraform_output
         run: |
-          NAME=$(terraform output azure_resource_group_name)
-          echo "resource_group_name=$NAME" >> "$GITHUB_OUTPUT"
+          RESOURCE_GROUP_NAME=$(terraform output azure_resource_group_name)
+          FUNCTION_NAME=$(terraform output azure_function_name)
+          echo "resource_group_name=$RESOURCE_GROUP_NAME" >> "$GITHUB_OUTPUT"
+          echo "function_name=$FUNCTION_NAME" >> "$GITHUB_OUTPUT"
 
   deploy_code:
     name: "Deploy code"
@@ -131,21 +133,32 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v4
 
-      - name: testing
+      - name: testing1
         env:
           RESOURCE_GROUP_NAME: ${{needs.deploy_infrastructure.outputs.resource_group_name}}
-        run: echo "$RESOURCE_GROUP_NAME"
+          FUNCTION_NAME: ${{needs.deploy_infrastructure.outputs.function_name}}
+        run: echo "$RESOURCE_GROUP_NAME $FUNCTION_NAME"
 
-      # - name: Azure Login
-      #   uses: azure/login@v1
-      #   with:
-      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           
-      # - name: Get Publish Profile
-      #   run: |
-      #     echo "::set-output name=PUBLISH_PROFILE::$(az webapp deployment list-publishing-profiles -g 'resource-group-name' -n 'app-service-name' --xml)"
-      #   id: getPublishProfile
+      - name: Get Publish Profile
+        id: publish_profile
+        env:
+          RESOURCE_GROUP_NAME: ${{needs.deploy_infrastructure.outputs.resource_group_name}}
+          FUNCTION_NAME: ${{needs.deploy_infrastructure.outputs.function_name}}
+        run: |
+          echo "::set-output name=PUBLISH_PROFILE::$(az webapp deployment list-publishing-profiles -g $RESOURCE_GROUP_NAME -n $FUNCTION_NAME --xml)"
 
+      - name: testing2
+        env:
+          PUBLISH_PROFILE: ${{steps.publish_profile.outputs.PUBLISH_PROFILE}}
+        run: echo "$PUBLISH_PROFILE"
+        
       # - name: Save publish profile
       #   uses: actions/upload-artifact@v4
       #   with:
