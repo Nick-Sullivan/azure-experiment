@@ -75,6 +75,9 @@ jobs:
   deploy_infrastructure:
     name: "Deploy infrastructure"
     needs: [build_code]
+    outputs:
+      # function_name: ${{ steps.terraform_output.outputs.function_name }}
+      resource_group_name: ${{ steps.terraform_output.outputs.resource_group_name }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
@@ -109,7 +112,45 @@ jobs:
           -var="tenant_id=${{secrets.AZURE_TENANT_ID}}"
           -var="subscription_id=${{secrets.AZURE_SUBSCRIPTION_ID}}"
 
-  # Deploy code
+      - name: Save output
+        working-directory: server/terraform
+        id: terraform_output
+        run: |
+          NAME=$(terraform output azure_resource_group_name)
+          echo "resource_group_name=$NAME" >> "$GITHUB_OUTPUT"
+
+  deploy_code:
+    name: "Deploy code"
+    needs: [deploy_infrastructure]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: testing
+        env:
+          RESOURCE_GROUP_NAME: ${{needs.deploy_infrastructure.outputs.resource_group_name}}
+        run: echo "$RESOURCE_GROUP_NAME"
+
+      # - name: Azure Login
+      #   uses: azure/login@v1
+      #   with:
+      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      # - name: Get Publish Profile
+      #   run: |
+      #     echo "::set-output name=PUBLISH_PROFILE::$(az webapp deployment list-publishing-profiles -g 'resource-group-name' -n 'app-service-name' --xml)"
+      #   id: getPublishProfile
+
+      # - name: Save publish profile
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: publish_profile
+      #     path: server/terraform/publish_profile.xml
 
   # Run tests
 

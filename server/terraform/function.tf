@@ -25,7 +25,8 @@ resource "azurerm_windows_function_app" "example" {
   lifecycle {
     ignore_changes = [
       # Don't clear deployments
-      app_settings["WEBSITE_RUN_FROM_PACKAGE"]
+      app_settings["WEBSITE_RUN_FROM_PACKAGE"],
+      app_settings["APPINSIGHTS_INSTRUMENTATIONKEY"]
     ]
   }
 }
