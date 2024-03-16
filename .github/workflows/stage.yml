@@ -6,6 +6,7 @@ on:
 
 env:
   IS_CICD: "true"
+  DOTNET_VERSION: '8.0.x'
 
 permissions:
   contents: write
@@ -44,9 +45,36 @@ jobs:
         with:
           ref: stage
 
+  build_code:
+    name: "Build code"
+    needs: [create_tag]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Setup DotNet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Build
+        working-directory: server/src
+        run: dotnet publish -c Release
+
+      # - name: Zip
+      #   uses: montudor/action-zip@v1
+      #   working-directory: server
+      #   with:
+      #     args: zip -qq -r src.zip src
+
   deploy_infrastructure:
     name: "Deploy infrastructure"
-    needs: [create_tag]
+    needs: [build_code]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
