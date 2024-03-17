@@ -173,14 +173,13 @@ jobs:
 
       - name: 'Deploy to Azure WebApp'
         uses: azure/webapps-deploy@v3
-        working-directory: server/src
         env:
           FUNCTION_NAME: ${{needs.deploy_infrastructure.outputs.function_name}}
           PUBLISH_PROFILE: ${{steps.publish_profile.outputs.publish_profile}}
         with:
           app-name: $FUNCTION_NAME
           publish-profile: $PUBLISH_PROFILE
-          package: build
+          package: server/src/build
 
   # Run tests
 
