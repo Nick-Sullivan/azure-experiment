@@ -12,15 +12,16 @@ namespace ApiTests;
 [TestFixture]
 public class WhenCallingOtherFunction
 {
-    private IPlaywright _playwright;
     private IAPIResponse _response;
 
     [OneTimeSetUp]
     public async Task SetUp()
     {
-        _playwright = await Playwright.CreateAsync();
-        var request = await _playwright.APIRequest.NewContextAsync(new() {
-            BaseURL = "https://azureexperiment-dev.azurewebsites.net",
+        var url = System.Environment.GetEnvironmentVariable("AZURE_API_URL");
+        var playwright = await Playwright.CreateAsync();
+        var request = await playwright.APIRequest.NewContextAsync(new()
+        {
+            BaseURL = url,
             ExtraHTTPHeaders = new Dictionary<string, string>(),
         });
         _response = await request.GetAsync("/api/OtherFunction");
