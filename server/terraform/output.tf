@@ -11,5 +11,5 @@ output "azure_function_name" {
 
 output "azure_function_url" {
   description = "URL of the Azure Function App."
-  value       = resource.azurerm_windows_function_app.example.url
+  value       = "https://${azurerm_windows_function_app.example.default_hostname}"
 }
