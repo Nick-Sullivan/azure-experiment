@@ -5,11 +5,24 @@
     "version": "0.2.0",
     "configurations": [
         {
-            // Or run `func start` in terminal
-            "name": "Attach to .NET Functions",
+            // Runs the local server and attaches a debugger
+            "name": "Local server",
             "type": "coreclr",
             "request": "attach",
+            "preLaunchTask": "run",
             "processId": "${command:azureFunctions.pickProcess}"
+        },
+        {
+            // Builds the tests. To run them, use the Testing extension
+            "name": "Build tests",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build tests",
+            "program": "${workspaceFolder}/test/bin/Debug/net8.0/test.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopAtEntry": false
         }
     ]
 }
