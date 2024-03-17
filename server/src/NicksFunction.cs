@@ -20,11 +20,5 @@ namespace Company.Function
             _logger.LogInformation("C# HTTP trigger function processed a request.");
             return new OkObjectResult("Welcome to Azure Functions!");
         }
-
-        [Function("Another")]
-        public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
-        {
-            return new OkObjectResult("This is a second response!");
-        }
     }
 }
