@@ -10,15 +10,17 @@ terraform {
     storage_account_name = "nicksterraform"
     container_name       = "tfstates"
     key                  = "azure_experiment.dev.terraform.tfstate"
+    use_oidc = true
   }
 }
 
 provider "azurerm" {
   features {}
-  client_id       = var.client_id
-  client_secret   = var.client_secret
-  tenant_id       = var.tenant_id
-  subscription_id = var.subscription_id
+  use_oidc = true
+  # client_id       = var.client_id
+  # client_secret   = var.client_secret
+  # tenant_id       = var.tenant_id
+  # subscription_id = var.subscription_id
 }
 
 locals {

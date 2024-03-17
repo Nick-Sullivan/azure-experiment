@@ -9,6 +9,7 @@ env:
   DOTNET_VERSION: '8.0.x'
 
 permissions:
+  id-token: write  # for OIDC auth
   contents: write
 
 concurrency:
@@ -101,25 +102,33 @@ jobs:
       - name: Azure login
         uses: azure/login@v2
         with:
-          creds: '{"clientId": "${{ secrets.AZURE_CLIENT_ID }}", "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}", "subscriptionId": "${{ secrets.AZURE_SUBSCRIPTION_ID }}", "tenantId": "${{ secrets.AZURE_TENANT_ID }}"}'
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           
       - name: Initialise terraform state
         working-directory: server/terraform
+        env:
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         run: terraform init
 
       - name: Apply terraform state
         working-directory: server/terraform
-        run: >
-          terraform apply
-          -auto-approve
-          -var="client_id=${{secrets.AZURE_CLIENT_ID}}"
-          -var="client_secret=${{secrets.AZURE_CLIENT_SECRET}}"
-          -var="tenant_id=${{secrets.AZURE_TENANT_ID}}"
-          -var="subscription_id=${{secrets.AZURE_SUBSCRIPTION_ID}}"
+        env:
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        run: terraform apply -auto-approve
 
       - name: Save output
         working-directory: server/terraform
         id: terraform_output
+        env:
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         run: |
           RESOURCE_GROUP_NAME=$(terraform output -raw azure_resource_group_name)
           FUNCTION_NAME=$(terraform output -raw azure_function_name)
