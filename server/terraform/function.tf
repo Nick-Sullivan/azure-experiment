@@ -18,6 +18,7 @@ resource "azurerm_windows_function_app" "example" {
   app_settings = {
     FUNCTIONS_WORKER_RUNTIME       = "dotnet-isolated"
     APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.example.instrumentation_key
+    WEBSITE_WEBDEPLOY_USE_SCM      = true
     # WEBSITE_RUN_FROM_PACKAGE       = 1
     # SCM_DO_BUILD_DURING_DEPLOYMENT = true  # true if zip_deploy_file is specified
   }
