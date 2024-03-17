@@ -98,6 +98,11 @@ jobs:
           name: build
           path: server/src/build
 
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: '{"clientId": "${{ secrets.AZURE_CLIENT_ID }}", "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}", "subscriptionId": "${{ secrets.AZURE_SUBSCRIPTION_ID }}", "tenantId": "${{ secrets.AZURE_TENANT_ID }}"}'
+          
       - name: Initialise terraform state
         working-directory: server/terraform
         run: terraform init
