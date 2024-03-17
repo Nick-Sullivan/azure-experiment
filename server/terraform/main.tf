@@ -5,10 +5,11 @@ terraform {
       version = "3.96.0"
     }
   }
-  backend "s3" {
-    bucket = "nicks-terraform-states"
-    region = "ap-southeast-2"
-    key    = "azure_experiment/dev/infrastructure/terraform.tfstate"
+  backend "azurerm" {
+    resource_group_name  = "TerraformStates"
+    storage_account_name = "nicksterraform"
+    container_name       = "tfstates"
+    key                  = "azure_experiment.dev.terraform.tfstate"
   }
 }
 
