@@ -19,7 +19,8 @@ public class WhenCallingNicksFunction
     public async Task SetUp()
     {
         _playwright = await Playwright.CreateAsync();
-        var request = await _playwright.APIRequest.NewContextAsync(new() {
+        var request = await _playwright.APIRequest.NewContextAsync(new()
+        {
             BaseURL = "https://azureexperiment-dev.azurewebsites.net",
             ExtraHTTPHeaders = new Dictionary<string, string>(),
         });
@@ -38,12 +39,4 @@ public class WhenCallingNicksFunction
         var text = await _response.TextAsync();
         Assert.That(text, Is.EqualTo("Welcome to Azure Functions!"));
     }
-
-    [Test]
-    public async Task DeliberateFailure()
-    {
-        var text = await _response.TextAsync();
-        Assert.That(text, Is.EqualTo("Something else!"));
-    }
-
 }

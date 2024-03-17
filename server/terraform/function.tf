@@ -28,9 +28,22 @@
 
 data "archive_file" "example" {
   type        = "zip"
-  source_dir = "${local.src_dir}/build/"
+  source_dir  = "${local.src_dir}/build/"
   output_path = "${local.root_dir}/zip/src.zip"
 }
+
+resource "terraform_data" "replacement_trigger" {
+  input = data.archive_file.example.output_md5
+}
+
+# resource "azurerm_storage_blob" "example" {
+#   name                   = local.prefix
+#   storage_account_name   = azurerm_storage_account.example.name
+#   storage_container_name = azurerm_storage_container.example.name
+#   type                   = "Block"
+#   source                 = data.archive_file.example.output_path
+#   content_md5            = data.archive_file.example.output_md5
+# }
 
 resource "azurerm_windows_function_app" "example" {
   name                       = local.prefix
@@ -45,14 +58,14 @@ resource "azurerm_windows_function_app" "example" {
     FUNCTIONS_WORKER_RUNTIME       = "dotnet-isolated"
     APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.example.instrumentation_key
     SCM_DO_BUILD_DURING_DEPLOYMENT = true
-    WEBSITE_RUN_FROM_PACKAGE = 1
+    WEBSITE_RUN_FROM_PACKAGE       = 1
+    # WEBSITE_RUN_FROM_PACKAGE = azurerm_storage_blob.example.url
   }
   lifecycle {
     ignore_changes = [
-      # Don't clear deployments
-      app_settings["WEBSITE_RUN_FROM_PACKAGE"],
       app_settings["APPINSIGHTS_INSTRUMENTATIONKEY"],
       site_config["application_insights_key"]
     ]
+    replace_triggered_by = [terraform_data.replacement_trigger]
   }
 }

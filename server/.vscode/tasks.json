@@ -67,7 +67,7 @@
       },
       // Publish release
       {
-        "label": "publish (functions)",
+        "label": "publish release",
         "command": "dotnet",
         "args": [
           "publish",

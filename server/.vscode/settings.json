@@ -2,10 +2,12 @@
     "[yml]": {
         "editor.tabSize": 2
     },
-    "dotnet.defaultSolution": "AzureExperiment.sln",
     "azureFunctions.deploySubpath": "src/bin/Release/net8.0/publish",
+    "azureFunctions.preDeployTask": "publish release",
     "azureFunctions.projectLanguage": "C#",
     "azureFunctions.projectRuntime": "~4",
     "debug.internalConsoleOptions": "neverOpen",
-    "azureFunctions.preDeployTask": "publish (functions)"
+    "editor.formatOnSave": true,
+    "omnisharp.enableRoslynAnalyzers": true,
+    "omnisharp.enableEditorConfigSupport": true
 }
