@@ -214,5 +214,5 @@ jobs:
       - name: Run server api tests
         working-directory: server/test
         env:
-          AZURE_FUNCTION_URL: ${{needs.deploy_infrastructure.outputs.function_url}}
+          AZURE_API_URL: ${{needs.deploy_infrastructure.outputs.function_url}}
         run: dotnet test
