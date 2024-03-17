@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace ApiTests;
 
 [TestFixture]
-public class WhenCallingNicksFunction
+public class WhenCallingOtherFunction
 {
     private IPlaywright _playwright;
     private IAPIResponse _response;
@@ -23,7 +23,7 @@ public class WhenCallingNicksFunction
             BaseURL = "https://azureexperiment-dev.azurewebsites.net",
             ExtraHTTPHeaders = new Dictionary<string, string>(),
         });
-        _response = await request.GetAsync("/api/NicksFunction");
+        _response = await request.GetAsync("/api/OtherFunction");
     }
 
     [Test]
@@ -36,14 +36,7 @@ public class WhenCallingNicksFunction
     public async Task ItShouldReturnExpectedString()
     {
         var text = await _response.TextAsync();
-        Assert.That(text, Is.EqualTo("Welcome to Azure Functions!"));
-    }
-
-    [Test]
-    public async Task DeliberateFailure()
-    {
-        var text = await _response.TextAsync();
-        Assert.That(text, Is.EqualTo("Something else!"));
+        Assert.That(text, Is.EqualTo("Hello!"));
     }
 
 }

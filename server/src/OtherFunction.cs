@@ -5,19 +5,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Company.Function;
 
-public class NicksFunction
+public class OtherFunction
 {
-    private readonly ILogger<NicksFunction> _logger;
+    private readonly ILogger<OtherFunction> _logger;
 
-    public NicksFunction(ILogger<NicksFunction> logger)
+    public OtherFunction(ILogger<OtherFunction> logger)
     {
         _logger = logger;
     }
 
-    [Function("NicksFunction")]
+    [Function("OtherFunction")]
     public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
     {
-        _logger.LogInformation("C# HTTP trigger function processed a request.");
-        return new OkObjectResult("Welcome to Azure Functions!");
+        return new OkObjectResult("Hello!");
     }
 }
