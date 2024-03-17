@@ -64,7 +64,14 @@ jobs:
 
       - name: Build
         working-directory: server/src
-        run: dotnet publish -c Release
+        run: |
+          dotnet publish -c Release -o build 
+      
+      - name: Save artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: server/src/build
 
   deploy_infrastructure:
     name: "Deploy infrastructure"
@@ -158,6 +165,7 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }} 
       - name: dotnet build and publish
+        working-directory: server/src
         run: |
           dotnet restore
           dotnet build --configuration Release
@@ -165,6 +173,7 @@ jobs:
 
       - name: 'Deploy to Azure WebApp'
         uses: azure/webapps-deploy@v3
+        working-directory: server/src
         env:
           FUNCTION_NAME: ${{needs.deploy_infrastructure.outputs.function_name}}
           PUBLISH_PROFILE: ${{steps.publish_profile.outputs.publish_profile}}
