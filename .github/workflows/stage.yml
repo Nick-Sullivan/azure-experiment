@@ -203,9 +203,10 @@ jobs:
         working-directory: server/test
         run: dotnet build
 
-      - name: Ensure browsers are installed
-        working-directory: server/test
-        run: pwsh bin/Debug/net8.0/playwright.ps1 install --with-deps
+      # This is only necessary for browser testing
+      # - name: Ensure browsers are installed
+      #   working-directory: server/test
+      #   run: pwsh bin/Debug/net8.0/playwright.ps1 install --with-deps
 
       - name: Run server api tests
         working-directory: server/test
