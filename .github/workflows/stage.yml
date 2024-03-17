@@ -184,7 +184,7 @@ jobs:
 
   api_tests:
     name: "API tests"
-    needs: [deploy_code]
+    needs: [deploy_infrastructure]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
