@@ -159,17 +159,23 @@ jobs:
           PUBLISH_PROFILE: ${{steps.publish_profile.outputs.publish_profile}}
         run: echo "$PUBLISH_PROFILE"
 
-      # TODO - reuse earlier build
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v1
+      - name: Download build
+        uses: actions/download-artifact@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }} 
-      - name: dotnet build and publish
-        working-directory: server/src
-        run: |
-          dotnet restore
-          dotnet build --configuration Release
-          dotnet publish -c Release -o build 
+          name: build
+          path: server/src/build
+
+      # TODO - reuse earlier build
+      # - name: Setup .NET Core
+      #   uses: actions/setup-dotnet@v1
+      #   with:
+      #     dotnet-version: ${{ env.DOTNET_VERSION }} 
+      # - name: dotnet build and publish
+      #   working-directory: server/src
+      #   run: |
+      #     dotnet restore
+      #     dotnet build --configuration Release
+      #     dotnet publish -c Release -o build 
 
       - name: 'Deploy to Azure WebApp'
         uses: azure/webapps-deploy@v3
@@ -177,8 +183,8 @@ jobs:
           FUNCTION_NAME: ${{needs.deploy_infrastructure.outputs.function_name}}
           PUBLISH_PROFILE: ${{steps.publish_profile.outputs.publish_profile}}
         with:
-          app-name: $FUNCTION_NAME
-          publish-profile: $PUBLISH_PROFILE
+          app-name: "$FUNCTION_NAME"
+          publish-profile: "$PUBLISH_PROFILE"
           package: server/src/build
 
   # Run tests
