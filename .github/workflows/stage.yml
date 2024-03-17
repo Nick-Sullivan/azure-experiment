@@ -145,18 +145,33 @@ jobs:
           FUNCTION_NAME: ${{needs.deploy_infrastructure.outputs.function_name}}
         run: |
           PUBLISH_PROFILE=$(az webapp deployment list-publishing-profiles -g $RESOURCE_GROUP_NAME -n $FUNCTION_NAME --xml)
-          echo "PUBLISH_PROFILE=$PUBLISH_PROFILE" >> "$GITHUB_OUTPUT"
+          echo "publish_profile=$PUBLISH_PROFILE" >> "$GITHUB_OUTPUT"
 
       - name: testing2
         env:
-          PUBLISH_PROFILE: ${{steps.publish_profile.outputs.PUBLISH_PROFILE}}
+          PUBLISH_PROFILE: ${{steps.publish_profile.outputs.publish_profile}}
         run: echo "$PUBLISH_PROFILE"
 
-      # - name: Save publish profile
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: publish_profile
-      #     path: server/terraform/publish_profile.xml
+      # TODO - reuse earlier build
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }} 
+      - name: dotnet build and publish
+        run: |
+          dotnet restore
+          dotnet build --configuration Release
+          dotnet publish -c Release -o build 
+
+      - name: 'Deploy to Azure WebApp'
+        uses: azure/webapps-deploy@v3
+        env:
+          FUNCTION_NAME: ${{needs.deploy_infrastructure.outputs.function_name}}
+          PUBLISH_PROFILE: ${{steps.publish_profile.outputs.publish_profile}}
+        with:
+          app-name: $FUNCTION_NAME
+          publish-profile: $PUBLISH_PROFILE
+          package: build
 
   # Run tests
 
