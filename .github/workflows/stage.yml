@@ -186,6 +186,7 @@ jobs:
     name: "API tests"
     needs: [deploy_infrastructure]
     runs-on: ubuntu-latest
+    working-directory: server/test
     timeout-minutes: 10
     defaults:
       run:
@@ -199,6 +200,11 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Build server api tests
+        run: dotnet build
+
+      - name: Ensure browsers are installed
+        run: pwsh bin/Debug/net8.0/playwright.ps1 install --with-deps
+
       - name: Run server api tests
-        working-directory: server/test
         run: dotnet test
