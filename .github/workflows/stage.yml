@@ -144,7 +144,8 @@ jobs:
           RESOURCE_GROUP_NAME: ${{needs.deploy_infrastructure.outputs.resource_group_name}}
           FUNCTION_NAME: ${{needs.deploy_infrastructure.outputs.function_name}}
         run: |
-          echo "::set-output name=PUBLISH_PROFILE::$(az webapp deployment list-publishing-profiles -g $RESOURCE_GROUP_NAME -n $FUNCTION_NAME --xml)"
+          PUBLISH_PROFILE=$(az webapp deployment list-publishing-profiles -g $RESOURCE_GROUP_NAME -n $FUNCTION_NAME --xml)
+          echo "PUBLISH_PROFILE=$PUBLISH_PROFILE" >> "$GITHUB_OUTPUT"
 
       - name: testing2
         env:
