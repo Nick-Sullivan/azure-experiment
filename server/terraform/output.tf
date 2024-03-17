@@ -8,3 +8,8 @@ output "azure_function_name" {
   description = "Name of the Azure Function App."
   value       = resource.azurerm_windows_function_app.example.name
 }
+
+output "azure_function_url" {
+  description = "URL of the Azure Function App."
+  value       = resource.azurerm_windows_function_app.example.url
+}
