@@ -172,7 +172,7 @@ jobs:
           PUBLISH_PROFILE: ${{steps.publish_profile.outputs.publish_profile}}
         with:
           app-name: $FUNCTION_NAME
-          publish-profile: $PUBLISH_PROFILE
+          publish-profile: "$PUBLISH_PROFILE"
           package: server/src/build
 
   # Run tests
