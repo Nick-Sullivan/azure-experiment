@@ -64,6 +64,12 @@ cd src
 dotnet publish -c Release -o build
 ```
 
+- Initialise terraform (only needs to be run once)
+```
+cd terraform
+terraform init -backend-config "key=azure_experiment.dev.terraform.tfstate"
+```
+
 - Deploy
 ```
 cd terraform

@@ -9,8 +9,7 @@ terraform {
     resource_group_name  = "TerraformStates"
     storage_account_name = "nicksterraform"
     container_name       = "tfstates"
-    key                  = "azure_experiment.dev.terraform.tfstate"
-    use_oidc             = true
+    use_oidc = true
   }
 }
 

@@ -112,7 +112,7 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        run: terraform init
+        run: terraform init -backend-config "key=azure_experiment.dev.terraform.tfstate"
 
       - name: Apply terraform state
         working-directory: server/terraform
@@ -136,60 +136,6 @@ jobs:
           echo "resource_group_name=$RESOURCE_GROUP_NAME" >> "$GITHUB_OUTPUT"
           echo "function_name=$FUNCTION_NAME" >> "$GITHUB_OUTPUT"
           echo "function_url=$FUNCTION_URL" >> "$GITHUB_OUTPUT"
-
-  # deploy_code:
-  #   name: "Deploy code"
-  #   needs: [deploy_infrastructure]
-  #   runs-on: ubuntu-latest
-  #   timeout-minutes: 10
-  #   defaults:
-  #     run:
-  #       shell: bash
-  #   steps:
-  #     - name: Checkout branch
-  #       uses: actions/checkout@v4
-
-  #     - name: testing1
-  #       env:
-  #         RESOURCE_GROUP_NAME: ${{needs.deploy_infrastructure.outputs.resource_group_name}}
-  #         FUNCTION_NAME: ${{needs.deploy_infrastructure.outputs.function_name}}
-  #       run: echo "$RESOURCE_GROUP_NAME $FUNCTION_NAME"
-
-  #     - name: Azure login
-  #       uses: azure/login@v2
-  #       with:
-  #         creds: '{"clientId": "${{ secrets.AZURE_CLIENT_ID }}", "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}", "subscriptionId": "${{ secrets.AZURE_SUBSCRIPTION_ID }}", "tenantId": "${{ secrets.AZURE_TENANT_ID }}"}'
-          
-  #     - name: Get Publish Profile
-  #       id: publish_profile
-  #       env:
-  #         RESOURCE_GROUP_NAME: ${{needs.deploy_infrastructure.outputs.resource_group_name}}
-  #         FUNCTION_NAME: ${{needs.deploy_infrastructure.outputs.function_name}}
-  #       run: |
-  #         PUBLISH_PROFILE=$(az webapp deployment list-publishing-profiles -g $RESOURCE_GROUP_NAME -n $FUNCTION_NAME --xml)
-  #         echo "publish_profile=$PUBLISH_PROFILE" >> "$GITHUB_OUTPUT"
-
-  #     - name: testing2
-  #       env:
-  #         PUBLISH_PROFILE: ${{steps.publish_profile.outputs.publish_profile}}
-  #       run: echo $PUBLISH_PROFILE
-
-  #     - name: Download build
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: build
-  #         path: server/src/build
-
-  #     - name: Deploy to Azure WebApp
-  #       uses: azure/webapps-deploy@v3
-  #       env:
-  #         FUNCTION_NAME: ${{needs.deploy_infrastructure.outputs.function_name}}
-  #         PUBLISH_PROFILE: ${{steps.publish_profile.outputs.publish_profile}}
-  #       with:
-  #         app-name: $FUNCTION_NAME
-  #         # publish-profile: "$PUBLISH_PROFILE"
-  #         publish-profile: ${{ secrets.PUBLISH_SETTINGS }}
-  #         package: server/src/build
 
   api_tests:
     name: "API tests"

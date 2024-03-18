@@ -33,17 +33,9 @@ data "archive_file" "example" {
 }
 
 resource "terraform_data" "replacement_trigger" {
-  input = data.archive_file.example.output_md5
+  # Detects changes to files inside the build directory, not any sub folders.
+  input = sha1(join("", [for f in fileset("${local.src_dir}/build", "*") : filesha1("${local.src_dir}/build/${f}")]))
 }
-
-# resource "azurerm_storage_blob" "example" {
-#   name                   = local.prefix
-#   storage_account_name   = azurerm_storage_account.example.name
-#   storage_container_name = azurerm_storage_container.example.name
-#   type                   = "Block"
-#   source                 = data.archive_file.example.output_path
-#   content_md5            = data.archive_file.example.output_md5
-# }
 
 resource "azurerm_windows_function_app" "example" {
   name                       = local.prefix
@@ -55,11 +47,10 @@ resource "azurerm_windows_function_app" "example" {
   site_config {}
   zip_deploy_file = data.archive_file.example.output_path
   app_settings = {
-    FUNCTIONS_WORKER_RUNTIME       = "dotnet-isolated"
     APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.example.instrumentation_key
+    FUNCTIONS_WORKER_RUNTIME       = "dotnet-isolated"
     SCM_DO_BUILD_DURING_DEPLOYMENT = true
     WEBSITE_RUN_FROM_PACKAGE       = 1
-    # WEBSITE_RUN_FROM_PACKAGE = azurerm_storage_blob.example.url
   }
   lifecycle {
     ignore_changes = [
