@@ -9,7 +9,7 @@ terraform {
     resource_group_name  = "TerraformStates"
     storage_account_name = "nicksterraform"
     container_name       = "tfstates"
-    use_oidc = true
+    use_oidc             = true
   }
 }
 
@@ -19,14 +19,14 @@ provider "azurerm" {
 }
 
 locals {
-  prefix       = "AzureExperiment-Dev"
-  prefix_lower = "azureexperimentdev"
+  prefix       = "AzureExperiment-${title(var.environment)}"
+  prefix_lower = "azureexperiment${lower(var.environment)}"
   root_dir     = "${path.root}/.."
   src_dir      = "${local.root_dir}/src"
 
   tags = {
     Project     = "Azure Experiment"
-    Environment = "dev"
+    Environment = lower(var.environment)
   }
 }
 

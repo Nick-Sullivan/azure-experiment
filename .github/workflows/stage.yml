@@ -5,8 +5,8 @@ on:
     branches: ["main"]
 
 env:
-  IS_CICD: "true"
   DOTNET_VERSION: '8.0.x'
+  ENVIRONMENT: 'stage'
 
 permissions:
   id-token: write  # for OIDC auth
@@ -112,7 +112,7 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        run: terraform init -backend-config "key=azure_experiment.dev.terraform.tfstate"
+        run: terraform init -backend-config "key=azure_experiment.${{ env.ENVIRONMENT }}.terraform.tfstate"
 
       - name: Apply terraform state
         working-directory: server/terraform
@@ -120,7 +120,7 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -var="environment=${{ env.ENVIRONMENT }}"
 
       - name: Save output
         working-directory: server/terraform

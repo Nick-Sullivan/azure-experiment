@@ -2,21 +2,18 @@
 
 Create a `.env` file with the following:
 ```
-# Do not commit this to source control
-ENVIRONMENT=dev
-CLIENT_ID=...
-CLIENT_SECRET=...
-TENANT_ID=...
-SUBSCRIPTION_ID=...
+# Do not commit this to source control, as it can contain secrets.
 
-# Created by terraform, but not automatically updated
-AZURE_API_URL=...
+# Used by automated tests
+AZURE_API_URL=https://azureexperiment-dev.azurewebsites.net
 ```
 
 Install the following:
 - .NET8
 - VSCode extensions (C# Dev Kit, Azure Functions, Azure Resources)
 - Azure CLI (for terraform deployment)
+
+It will take some manual effort to provide OIDC for your local environment.
 
 ## Building locally
 
@@ -55,7 +52,7 @@ dotnet test
 
 ## Deployment
 
-CICD controls the deployment when pushing to `main`.
+CICD controls the deployment when pushing to `main`. It will deploy to the `stage` environment. There is a manual trigger in GitHub actions to deploy to `prod` environment.
 
 To manually deploy, run the steps:
 - Build
@@ -77,7 +74,6 @@ terraform apply
 ```
 
 Alternatively, use the Azure extension. Right click the Function App and select "Deploy to Function App"
-
 
 ## Notes
 
