@@ -71,3 +71,8 @@ terraform apply
 ```
 
 Alternatively, use the Azure extension. Right click the Function App and select "Deploy to Function App"
+
+
+## Notes
+
+https://github.com/marketplace/actions/azure-login#login-with-openid-connect-oidc-recommended
