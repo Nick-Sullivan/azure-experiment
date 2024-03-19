@@ -4,13 +4,10 @@ on:
   push:
     branches: ["main"]
 
-concurrency: ${{ env.ENVIRONMENT }}
+concurrency: stage
 
 env:
   DOTNET_VERSION: '8.0.x'
-  ENVIRONMENT: 'stage'
-
-
 
 permissions:
   id-token: write  # for OIDC auth
@@ -19,7 +16,7 @@ permissions:
 jobs:
   create_tag:
     name: "Create tag"
-    environment: ${{ env.ENVIRONMENT }}
+    environment: stage
     runs-on: ubuntu-latest
     timeout-minutes: 1
     defaults:
@@ -50,7 +47,7 @@ jobs:
   build_code:
     name: "Build code"
     needs: [create_tag]
-    environment: ${{ env.ENVIRONMENT }}
+    environment: stage
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
@@ -79,7 +76,7 @@ jobs:
   deploy_infrastructure:
     name: "Deploy infrastructure"
     needs: [build_code]
-    environment: ${{ env.ENVIRONMENT }}
+    environment: stage
     outputs:
       function_name: ${{ steps.terraform_output.outputs.function_name }}
       function_url: ${{ steps.terraform_output.outputs.function_url }}
@@ -115,7 +112,7 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        run: terraform init -backend-config "key=azure_experiment.${{ env.ENVIRONMENT }}.terraform.tfstate"
+        run: terraform init -backend-config "key=azure_experiment.stage.terraform.tfstate"
 
       - name: Apply terraform state
         working-directory: server/terraform
@@ -123,7 +120,7 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        run: terraform apply -auto-approve -var="environment=${{ env.ENVIRONMENT }}"
+        run: terraform apply -auto-approve -var="environment=stage"
 
       - name: Save output
         working-directory: server/terraform
@@ -143,7 +140,7 @@ jobs:
   api_tests:
     name: "API tests"
     needs: [deploy_infrastructure]
-    environment: ${{ env.ENVIRONMENT }}
+    environment: stage
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
