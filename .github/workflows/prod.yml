@@ -1,7 +1,12 @@
 name: Prod
-run-name: Prod deployment to ${{ inputs.deploy_target }}
+run-name: Prod deployment to ${{ github.event.inputs.build_version }} by @{{ github.actor }}
 
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+    inputs:
+      build_version:
+        description: Code version to deploy to production e.g. 1.0.25
+        required: true
 
 concurrency: prod
 

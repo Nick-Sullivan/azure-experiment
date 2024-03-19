@@ -18,6 +18,8 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    outputs:
+      build_number: ${{ steps.buildnumber.outputs.build_number }}
     timeout-minutes: 10
     defaults:
       run:
@@ -153,3 +155,18 @@ jobs:
         env:
           AZURE_API_URL: ${{needs.deploy.outputs.function_url}}
         run: dotnet test
+
+  create_release:
+    name: Create Release
+    needs: [build, test_api]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - uses: ncipollo/release-action@v1
+        with:
+          # artifacts: build
+          # bodyFile: "body.md"
+          tag: ${{needs.build.outputs.build_number}}
