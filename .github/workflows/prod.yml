@@ -1,12 +1,6 @@
 name: Prod
 
-on:
-  workflow_dispatch:
-    inputs:
-      build_version:
-        description: 'The source code tag and build version to use e.g. 1.0.25'
-        required: true
-        type: string
+on: workflow_dispatch
 
 concurrency: prod
 
@@ -31,7 +25,6 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
-        ref: ${{ github.event.inputs.build_version }}
 
       - name: Setup DotNet
         uses: actions/setup-dotnet@v4
@@ -65,8 +58,6 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
-        with: 
-          ref: ${{ github.event.inputs.build_version }}
 
       - name: Setup terraform
         uses: hashicorp/setup-terraform@v3
