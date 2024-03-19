@@ -180,8 +180,9 @@ jobs:
 
       - name: Zip build
         uses: montudor/action-zip@v1
+        working-directory: server/src
         with:
-          args: zip -qq -r build.zip server/src/build
+          args: zip -qq -r build.zip build
 
       - name: Create release
         uses: ncipollo/release-action@v1

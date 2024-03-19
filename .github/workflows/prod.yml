@@ -36,7 +36,7 @@ jobs:
       - name: Unzip build
         uses: montudor/action-zip@v1
         with:
-          args: unzip -qq build.zip -d server/src/build
+          args: unzip -qq build.zip -d server/src
 
       - name: Azure login
         uses: azure/login@v2
