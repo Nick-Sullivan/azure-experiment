@@ -1,4 +1,5 @@
 name: Prod
+run-name: Prod deployment to ${{ inputs.deploy_target }}
 
 on: workflow_dispatch
 
