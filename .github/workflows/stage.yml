@@ -165,8 +165,9 @@ jobs:
       run:
         shell: bash
     steps:
-    - uses: ncipollo/release-action@v1
-        with:
-          # artifacts: build
-          # bodyFile: "body.md"
-          tag: ${{needs.build.outputs.build_number}}
+    - name: Create release
+      uses: ncipollo/release-action@v1
+      with:
+        # artifacts: build
+        # bodyFile: "body.md"
+        tag: ${{needs.build.outputs.build_number}}
