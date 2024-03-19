@@ -178,11 +178,12 @@ jobs:
           name: build
           path: server/src/build
 
+      - name: Install zip
+        uses: montudor/action-zip@v1
+
       - name: Zip build
         working-directory: server/src
-        uses: montudor/action-zip@v1
-        with:
-          args: zip -qq -r build.zip build
+        run: zip -qq -r build.zip build
 
       - name: Create release
         uses: ncipollo/release-action@v1
