@@ -1,4 +1,4 @@
-name: "Prod"
+name: Prod
 
 on:
   workflow_dispatch:
@@ -22,7 +22,7 @@ jobs:
 
   # TODO: download previous build instead
   build:
-    name: "Build"
+    name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
@@ -50,7 +50,7 @@ jobs:
           path: server/src/build
 
   deploy:
-    name: "Deploy"
+    name: Deploy
     needs: [build]
     environment: prod
     outputs:
@@ -115,18 +115,7 @@ jobs:
           echo "function_name=$FUNCTION_NAME" >> "$GITHUB_OUTPUT"
           echo "function_url=$FUNCTION_URL" >> "$GITHUB_OUTPUT"
 
-      - name: Generate build number
-        id: buildnumber
-        uses: onyxmueller/build-tag-number@v1
-        with:
-          token: ${{secrets.GITHUB_TOKEN}}
-
-      - name: "Create unique tag"
-        uses: EndBug/latest-tag@v1.6.1
-        with:
-          ref: "1.0.${{steps.buildnumber.outputs.build_number}}"
-
-      - name: "Create environment tag"
+      - name: Create environment tag
         uses: EndBug/latest-tag@v1.6.1
         with:
           ref: prod
