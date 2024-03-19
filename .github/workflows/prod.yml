@@ -1,52 +1,16 @@
 name: Prod
-run-name: Prod deployment to ${{ github.event.inputs.build_version }} by @{{ github.actor }}
 
 on: 
-  workflow_dispatch:
-    inputs:
-      build_version:
-        description: Code version to deploy to production e.g. 1.0.25
-        required: true
+  release:
+    types: [published]
 
 concurrency: prod
-
-# TODO: download previous build instead
-env:
-  DOTNET_VERSION: '8.0.x'
 
 permissions:
   id-token: write  # for OIDC auth
   contents: write
 
 jobs:
-
-  # TODO: download previous build instead
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checkout branch
-        uses: actions/checkout@v4
-
-      - name: Setup DotNet
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Build
-        working-directory: server/src
-        run: |
-          dotnet publish -c Release -o build 
-      
-      - name: Save artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build
-          path: server/src/build
 
   deploy:
     name: Deploy
@@ -69,10 +33,11 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Download build
-        uses: actions/download-artifact@v4
+      - uses: robinraju/release-downloader@v1.9
         with:
-          name: build
-          path: server/src/build
+          tag: ${{ github.event.release.tag_name }}
+          fileName: build
+          out-file-path: server/src
 
       - name: Azure login
         uses: azure/login@v2

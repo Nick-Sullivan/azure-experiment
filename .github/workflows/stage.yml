@@ -168,6 +168,6 @@ jobs:
     - name: Create release
       uses: ncipollo/release-action@v1
       with:
-        # artifacts: build
-        # bodyFile: "body.md"
-        tag: ${{needs.build.outputs.build_number}}
+        artifacts: build
+        draft: true
+        tag: 1.0.${{needs.build.outputs.build_number}}
