@@ -4,17 +4,17 @@ on:
   push:
     branches: ["main"]
 
+concurrency: stage
+
 env:
   DOTNET_VERSION: '8.0.x'
   ENVIRONMENT: 'stage'
 
+environment: stage
+
 permissions:
   id-token: write  # for OIDC auth
   contents: write
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
 
 jobs:
   create_tag:
