@@ -1,13 +1,14 @@
-name: "Stage"
+name: "Prod"
 
 on:
-  push:
-    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      build_version:
+        description: 'The source code tag and build version to use e.g. 1.0.25'
+        required: true
+        type: string
 
-concurrency: stage
-
-env:
-  DOTNET_VERSION: '8.0.x'
+concurrency: prod
 
 permissions:
   id-token: write  # for OIDC auth
@@ -15,6 +16,7 @@ permissions:
 
 jobs:
 
+  # TODO: download previous build instead
   build:
     name: "Build"
     runs-on: ubuntu-latest
@@ -25,6 +27,7 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
+        ref: ${{ github.event.inputs.build_version }}
 
       - name: Setup DotNet
         uses: actions/setup-dotnet@v4
@@ -45,7 +48,7 @@ jobs:
   deploy:
     name: "Deploy"
     needs: [build]
-    environment: stage
+    environment: prod
     outputs:
       function_name: ${{ steps.terraform_output.outputs.function_name }}
       function_url: ${{ steps.terraform_output.outputs.function_url }}
@@ -58,6 +61,7 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
+        ref: ${{ github.event.inputs.build_version }}
 
       - name: Setup terraform
         uses: hashicorp/setup-terraform@v3
@@ -81,7 +85,7 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        run: terraform init -backend-config "key=azure_experiment.stage.terraform.tfstate"
+        run: terraform init -backend-config "key=azure_experiment.prod.terraform.tfstate"
 
       - name: Apply terraform state
         working-directory: server/terraform
@@ -89,7 +93,7 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        run: terraform apply -auto-approve -var="environment=stage"
+        run: terraform apply -auto-approve -var="environment=prod"
 
       - name: Save output
         working-directory: server/terraform
@@ -120,36 +124,4 @@ jobs:
       - name: "Create environment tag"
         uses: EndBug/latest-tag@v1.6.1
         with:
-          ref: stage
-
-  test_api:
-    name: "Test API"
-    needs: [deploy]
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checkout branch
-        uses: actions/checkout@v4
-
-      - name: Setup DotNet
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Build server api tests
-        working-directory: server/test
-        run: dotnet build
-
-      # This is only necessary for browser testing
-      # - name: Ensure browsers are installed
-      #   working-directory: server/test
-      #   run: pwsh bin/Debug/net8.0/playwright.ps1 install --with-deps
-
-      - name: Run server api tests
-        working-directory: server/test
-        env:
-          AZURE_API_URL: ${{needs.deploy.outputs.function_url}}
-        run: dotnet test
+          ref: prod
