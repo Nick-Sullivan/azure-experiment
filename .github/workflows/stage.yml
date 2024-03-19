@@ -4,13 +4,13 @@ on:
   push:
     branches: ["main"]
 
-concurrency: stage
+concurrency: ${{ env.ENVIRONMENT }}
 
 env:
   DOTNET_VERSION: '8.0.x'
   ENVIRONMENT: 'stage'
 
-environment: stage
+
 
 permissions:
   id-token: write  # for OIDC auth
@@ -19,6 +19,7 @@ permissions:
 jobs:
   create_tag:
     name: "Create tag"
+    environment: ${{ env.ENVIRONMENT }}
     runs-on: ubuntu-latest
     timeout-minutes: 1
     defaults:
@@ -49,6 +50,7 @@ jobs:
   build_code:
     name: "Build code"
     needs: [create_tag]
+    environment: ${{ env.ENVIRONMENT }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
@@ -77,6 +79,7 @@ jobs:
   deploy_infrastructure:
     name: "Deploy infrastructure"
     needs: [build_code]
+    environment: ${{ env.ENVIRONMENT }}
     outputs:
       function_name: ${{ steps.terraform_output.outputs.function_name }}
       function_url: ${{ steps.terraform_output.outputs.function_url }}
@@ -140,6 +143,7 @@ jobs:
   api_tests:
     name: "API tests"
     needs: [deploy_infrastructure]
+    environment: ${{ env.ENVIRONMENT }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
