@@ -14,40 +14,9 @@ permissions:
   contents: write
 
 jobs:
-  create_tag:
-    name: "Create tag"
-    environment: stage
-    runs-on: ubuntu-latest
-    timeout-minutes: 1
-    defaults:
-      run:
-        shell: bash
-    outputs:
-      build_number: ${{ steps.buildnumber.outputs.build_number }}
-    steps:
-      - name: Checkout branch
-        uses: actions/checkout@v4
-
-      - name: Generate build number
-        id: buildnumber
-        uses: onyxmueller/build-tag-number@v1
-        with:
-          token: ${{secrets.GITHUB_TOKEN}}
-
-      - name: "Create unique tag"
-        uses: EndBug/latest-tag@v1.6.1
-        with:
-          ref: "1.0.${{steps.buildnumber.outputs.build_number}}"
-
-      - name: "Create staging tag"
-        uses: EndBug/latest-tag@v1.6.1
-        with:
-          ref: stage
 
   build_code:
     name: "Build code"
-    needs: [create_tag]
-    environment: stage
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
@@ -137,10 +106,25 @@ jobs:
           echo "function_name=$FUNCTION_NAME" >> "$GITHUB_OUTPUT"
           echo "function_url=$FUNCTION_URL" >> "$GITHUB_OUTPUT"
 
+      - name: Generate build number
+        id: buildnumber
+        uses: onyxmueller/build-tag-number@v1
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+
+      - name: "Create unique tag"
+        uses: EndBug/latest-tag@v1.6.1
+        with:
+          ref: "1.0.${{steps.buildnumber.outputs.build_number}}"
+
+      - name: "Create staging tag"
+        uses: EndBug/latest-tag@v1.6.1
+        with:
+          ref: stage
+
   api_tests:
     name: "API tests"
     needs: [deploy_infrastructure]
-    environment: stage
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
