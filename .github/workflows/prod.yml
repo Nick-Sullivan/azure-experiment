@@ -31,8 +31,12 @@ jobs:
         uses: robinraju/release-downloader@v1.9
         with:
           tag: ${{ github.event.release.tag_name }}
-          fileName: build
-          out-file-path: server/src
+          fileName: build.zip
+
+      - name: Unzip build
+        uses: montudor/action-zip@v1
+        with:
+          args: unzip -qq -r build.zip server/src/build
 
       - name: Azure login
         uses: azure/login@v2
