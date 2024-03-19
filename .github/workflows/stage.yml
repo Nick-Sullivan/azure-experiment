@@ -188,7 +188,7 @@ jobs:
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: build.zip
+          artifacts: server/src/build.zip
           draft: true
           tag: ${{needs.build.outputs.build_version}}
       
