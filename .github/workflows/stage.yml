@@ -58,7 +58,7 @@ jobs:
           echo "build_version=$BUILD_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Create unique tag
-        uses: EndBug/latest-tag@v1.6.1
+        uses: EndBug/latest-tag@v1.6.2
         with:
           ref: ${{steps.build_version.outputs.build_version}}
 
@@ -127,7 +127,7 @@ jobs:
           echo "function_url=$FUNCTION_URL" >> "$GITHUB_OUTPUT"
 
       - name: Create environment tag
-        uses: EndBug/latest-tag@v1.6.1
+        uses: EndBug/latest-tag@v1.6.2
         with:
           ref: stage
 
