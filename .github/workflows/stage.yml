@@ -165,9 +165,16 @@ jobs:
       run:
         shell: bash
     steps:
-    - name: Create release
-      uses: ncipollo/release-action@v1
-      with:
-        artifacts: build
-        draft: true
-        tag: 1.0.${{needs.build.outputs.build_number}}
+      - name: Download build
+          uses: actions/download-artifact@v4
+          with:
+            name: build
+            path: server/src/build
+
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: server/src/build
+          draft: true
+          tag: 1.0.${{needs.build.outputs.build_number}}
+          

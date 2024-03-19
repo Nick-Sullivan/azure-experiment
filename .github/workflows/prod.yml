@@ -14,12 +14,7 @@ jobs:
 
   deploy:
     name: Deploy
-    needs: [build]
     environment: prod
-    outputs:
-      function_name: ${{ steps.terraform_output.outputs.function_name }}
-      function_url: ${{ steps.terraform_output.outputs.function_url }}
-      resource_group_name: ${{ steps.terraform_output.outputs.resource_group_name }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
@@ -61,21 +56,6 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         run: terraform apply -auto-approve -var="environment=prod"
-
-      - name: Save output
-        working-directory: server/terraform
-        id: terraform_output
-        env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        run: |
-          RESOURCE_GROUP_NAME=$(terraform output -raw azure_resource_group_name)
-          FUNCTION_NAME=$(terraform output -raw azure_function_name)
-          FUNCTION_URL=$(terraform output -raw azure_function_url)
-          echo "resource_group_name=$RESOURCE_GROUP_NAME" >> "$GITHUB_OUTPUT"
-          echo "function_name=$FUNCTION_NAME" >> "$GITHUB_OUTPUT"
-          echo "function_url=$FUNCTION_URL" >> "$GITHUB_OUTPUT"
 
       - name: Create environment tag
         uses: EndBug/latest-tag@v1.6.1
