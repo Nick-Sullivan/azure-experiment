@@ -33,7 +33,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Download build
-      - uses: robinraju/release-downloader@v1.9
+        uses: robinraju/release-downloader@v1.9
         with:
           tag: ${{ github.event.release.tag_name }}
           fileName: build
