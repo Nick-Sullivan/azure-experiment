@@ -61,7 +61,8 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
-        ref: ${{ github.event.inputs.build_version }}
+        with: 
+          ref: ${{ github.event.inputs.build_version }}
 
       - name: Setup terraform
         uses: hashicorp/setup-terraform@v3
