@@ -14,28 +14,28 @@ resource "azurerm_application_insights" "example" {
   application_type    = "web"
 }
 
-resource "azurerm_monitor_action_group" "example" {
-  name                = local.prefix
-  resource_group_name = azurerm_resource_group.example.name
-  short_name          = local.prefix_short
-}
+# resource "azurerm_monitor_action_group" "example" {
+#   name                = local.prefix
+#   resource_group_name = azurerm_resource_group.example.name
+#   short_name          = local.prefix_short
+# }
 
-# Smart rules are automatically enabled, which prevents terraform from destroying it automatically.
-# We create the rule here instead.
-resource "azurerm_monitor_smart_detector_alert_rule" "example" {
-  name                = local.prefix
-  resource_group_name = azurerm_resource_group.example.name
-  detector_type       = "FailureAnomaliesDetector"
-  scope_resource_ids  = [azurerm_application_insights.example.id]
-  severity            = "Sev0"
-  frequency           = "PT1M"
+# # Smart rules are automatically enabled, which prevents terraform from destroying it automatically.
+# # We create the rule here instead.
+# resource "azurerm_monitor_smart_detector_alert_rule" "example" {
+#   name                = local.prefix
+#   resource_group_name = azurerm_resource_group.example.name
+#   detector_type       = "FailureAnomaliesDetector"
+#   scope_resource_ids  = [azurerm_application_insights.example.id]
+#   severity            = "Sev0"
+#   frequency           = "PT1M"
 
-  action_group {
-    ids = [azurerm_monitor_action_group.example.id]
-  }
+#   action_group {
+#     ids = [azurerm_monitor_action_group.example.id]
+#   }
 
-  enabled = false
-}
+#   enabled = false
+# }
 
 # locals {
 #   insight_types = toset([
