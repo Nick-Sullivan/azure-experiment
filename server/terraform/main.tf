@@ -21,6 +21,7 @@ provider "azurerm" {
 locals {
   prefix       = "AzureExperiment-${title(var.environment)}"
   prefix_lower = "azureexperiment${lower(var.environment)}"
+  prefix_short = "azex${lower(var.environment)}"
   root_dir     = "${path.root}/.."
   src_dir      = "${local.root_dir}/src"
 

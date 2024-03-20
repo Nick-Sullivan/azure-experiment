@@ -32,8 +32,8 @@ data "archive_file" "example" {
   output_path = "${local.root_dir}/zip/src.zip"
 }
 
+# Detects changes to files inside the build directory, not any sub folders.
 resource "terraform_data" "replacement_trigger" {
-  # Detects changes to files inside the build directory, not any sub folders.
   input = sha1(join("", [for f in fileset("${local.src_dir}/build", "*") : filesha1("${local.src_dir}/build/${f}")]))
 }
 
